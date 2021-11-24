@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "DHT22.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,7 +59,13 @@ static void MX_ADC1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint8_t Presence = 0;
 
+uint8_t Rh_byte1, Rh_byte2, Temp_byte1, Temp_byte2;
+uint16_t Parity, RH, TEMP;
+
+float temperature = 0;
+float humidity = 0;
 /* USER CODE END 0 */
 
 /**
@@ -100,6 +106,20 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	DHT22_Start();
+	Presence = DHT22_Check_Response();
+	Rh_byte1 = DHT22_Read();
+	Rh_byte2 = DHT22_Read();
+	Temp_byte1 = DHT22_Read();
+	Temp_byte2 = DHT22_Read();
+	Parity = DHT22_Read();
+
+	TEMP = Temp_byte1;
+	RH = Rh_byte1;
+
+	temperature = (float)TEMP;
+	humidity = (float)RH;
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -280,23 +300,19 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : PB0 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  /*Configure GPIO pin : TEMP_HUM_SENSOR_PIN_Pin */
+  GPIO_InitStruct.Pin = TEMP_HUM_SENSOR_PIN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(TEMP_HUM_SENSOR_PIN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PD14 */
   GPIO_InitStruct.Pin = GPIO_PIN_14;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 }

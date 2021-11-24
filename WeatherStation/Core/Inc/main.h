@@ -60,6 +60,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LIGHT_SENSOR_PIN_Pin GPIO_PIN_5
 #define LIGHT_SENSOR_PIN_GPIO_Port GPIOC
+#define TEMP_HUM_SENSOR_PIN_Pin GPIO_PIN_0
+#define TEMP_HUM_SENSOR_PIN_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
