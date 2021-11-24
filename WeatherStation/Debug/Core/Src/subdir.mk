@@ -5,12 +5,9 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-<<<<<<< HEAD
 ../Core/Src/DHT22.c \
-=======
 ../Core/Src/helper_functions.c \
 ../Core/Src/light_sensor.c \
->>>>>>> 767874b2abac663f0b9cb60c2583b900457b9cba
 ../Core/Src/main.c \
 ../Core/Src/stm32l4xx_hal_msp.c \
 ../Core/Src/stm32l4xx_hal_timebase_tim.c \
@@ -20,12 +17,9 @@ C_SRCS += \
 ../Core/Src/system_stm32l4xx.c 
 
 OBJS += \
-<<<<<<< HEAD
 ./Core/Src/DHT22.o \
-=======
 ./Core/Src/helper_functions.o \
 ./Core/Src/light_sensor.o \
->>>>>>> 767874b2abac663f0b9cb60c2583b900457b9cba
 ./Core/Src/main.o \
 ./Core/Src/stm32l4xx_hal_msp.o \
 ./Core/Src/stm32l4xx_hal_timebase_tim.o \
@@ -35,12 +29,9 @@ OBJS += \
 ./Core/Src/system_stm32l4xx.o 
 
 C_DEPS += \
-<<<<<<< HEAD
 ./Core/Src/DHT22.d \
-=======
 ./Core/Src/helper_functions.d \
 ./Core/Src/light_sensor.d \
->>>>>>> 767874b2abac663f0b9cb60c2583b900457b9cba
 ./Core/Src/main.d \
 ./Core/Src/stm32l4xx_hal_msp.d \
 ./Core/Src/stm32l4xx_hal_timebase_tim.d \

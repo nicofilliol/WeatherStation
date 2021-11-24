@@ -12,7 +12,7 @@ extern UART_HandleTypeDef huart1;
 volatile int32_t ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
 #define UART_HANDLE huart1
 
-// #define USE_ITM
+//#define USE_ITM
 /**
  * Transmission and reception macros
  */

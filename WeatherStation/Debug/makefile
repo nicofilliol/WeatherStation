@@ -61,13 +61,8 @@ all: main-build
 main-build: WeatherStation.elf secondary-outputs
 
 # Tool invocations
-<<<<<<< HEAD
-WeatherStation.elf: $(OBJS) $(USER_OBJS) /Users/joelasper/Documents/ETH_Zurich/5_Semester/MicrocontrollersProject/WeatherStation/WeatherStation/STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "WeatherStation.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/joelasper/Documents/ETH_Zurich/5_Semester/MicrocontrollersProject/WeatherStation/WeatherStation/STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="WeatherStation.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-=======
 WeatherStation.elf: $(OBJS) $(USER_OBJS) /Users/Nico/Desktop/ETH/ITET\ HS21/P&S/WeatherStation/WeatherStation/STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	arm-none-eabi-gcc -o "WeatherStation.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/Nico/Desktop/ETH/ITET HS21/P&S/WeatherStation/WeatherStation/STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="WeatherStation.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
->>>>>>> 767874b2abac663f0b9cb60c2583b900457b9cba
 	@echo 'Finished building target: $@'
 	@echo ' '
 
