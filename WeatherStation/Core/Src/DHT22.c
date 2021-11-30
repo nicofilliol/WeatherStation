@@ -1,77 +1,172 @@
 /*
- * DHT22.c
- *
- *  Created on: 24 Nov 2021
- *      Author: joelasper
- */
+Library:					DHT22 - AM2302 Temperature and Humidity Sensor
+Written by:				Mohamed Yaqoob (MYaqoobEmbedded YouTube Channel)
+Date Written:			21/11/2018
+Last modified:		-/-
+Description:			This is an STM32 device driver library for the DHT22 Temperature and Humidity Sensor, using STM HAL libraries
+
+References:				This library was written based on the DHT22 datasheet
+										- https://cdn-shop.adafruit.com/datasheets/Digital+humidity+and+temperature+sensor+AM2302.pdf
+
+* Copyright (C) 2018 - M. Yaqoob
+   This is a free software under the GNU license, you can redistribute it and/or modify it under the terms
+   of the GNU General Public Licenseversion 3 as published by the Free Software Foundation.
+
+   This software library is shared with puplic for educational purposes, without WARRANTY and Author is not liable for any damages caused directly
+   or indirectly by this software, read more about this on the GNU General Public License.
+*/
+
+//Header files
 #include "DHT22.h"
 
-void Set_Pin_Input(void);
-void Set_Pin_Output(void);
+//Bit fields manipulations
+#define bitRead(value, bit) (((value) >> (bit)) & 0x01)
+#define bitSet(value, bit) ((value) |= (1UL << (bit)))
+#define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
+#define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
 
-// https://controllerstech.com/temperature-measurement-using-dht22-in-stm32/
-void DHT22_Start(void){
-	Set_Pin_Output(); // set the pin as output
-	HAL_GPIO_WritePin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin, 0);   // pull the pin low
-	HAL_Delay(1200);   // wait for > 1ms
+//1. One wire data line
+static GPIO_TypeDef* oneWire_PORT;
+static uint16_t oneWire_PIN;
+static uint8_t oneWirePin_Idx;
 
-	HAL_GPIO_WritePin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin, 1);   // pull the pin high
-	HAL_Delay(20);   // wait for 30us
-
-	Set_Pin_Input();   // set as input
-}
-
-uint8_t DHT22_Check_Response(void){
-	Set_Pin_Input();   // set as input
-	uint8_t Response = 0;
-	HAL_Delay(40);  // wait for 40us
-	if (!(HAL_GPIO_ReadPin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin))) // if the pin is low
+//*** Functions prototypes ***//
+//OneWire Initialise
+void DHT22_Init(GPIO_TypeDef* DataPort, uint16_t DataPin)
+{
+	oneWire_PORT = DataPort;
+	oneWire_PIN = DataPin;
+	for(uint8_t i=0; i<16; i++)
 	{
-		HAL_Delay(80);   // wait for 80us
-		if ((HAL_GPIO_ReadPin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin))) Response = 1;  // if the pin is high, response is ok
-		else Response = -1;
-	}
-
-	while ((HAL_GPIO_ReadPin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin)));   // wait for the pin to go low
-	return Response;
-}
-
-uint8_t DHT22_Read(void){
-	uint8_t i,j;
-	for (j=0;j<8;j++)
-	{
-		while (!(HAL_GPIO_ReadPin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin)));   // wait for the pin to go high
-		HAL_Delay(40);   // wait for 40 us
-
-		if (!(HAL_GPIO_ReadPin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin)))   // if the pin is low
+		if(DataPin & (1 << i))
 		{
-			i&= ~(1<<(7-j));   // write 0
+			oneWirePin_Idx = i;
+			break;
 		}
-		else i|= (1<<(7-j));  // if the pin is high, write 1
-		while ((HAL_GPIO_ReadPin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin)));  // wait for the pin to go low
 	}
 
-	return i;
+
 }
-
-void Set_Pin_Input(void){
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-	/*Configure GPIO pin : TEMP_HUM_SENSOR_PIN_Pin */
-	GPIO_InitStruct.Pin = TEMP_HUM_SENSOR_PIN_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(TEMP_HUM_SENSOR_PIN_GPIO_Port, &GPIO_InitStruct);
-}
-
-void Set_Pin_Output(void){
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-	/*Configure GPIO pin : TEMP_HUM_SENSOR_PIN_Pin */
-	GPIO_InitStruct.Pin = TEMP_HUM_SENSOR_PIN_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
+//Change pin mode
+static void ONE_WIRE_PinMode(OnePinMode_Typedef mode)
+{
+	GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitStruct.Pin = oneWire_PIN;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(TEMP_HUM_SENSOR_PIN_GPIO_Port, &GPIO_InitStruct);
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+
+	if(mode == ONE_OUTPUT)
+	{
+//		oneWire_PORT->MODER &= ~(3UL << 2*oneWirePin_Idx);  //Reset State
+//		oneWire_PORT->MODER |= (0x01 << 2*oneWirePin_Idx); //Output Mode
+		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	}
+	else if(mode == ONE_INPUT)
+	{
+//		oneWire_PORT->MODER &= ~(3UL << 2*oneWirePin_Idx);  //Input Mode
+		GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	}
+
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
+//One Wire pin HIGH/LOW Write
+static void ONE_WIRE_Pin_Write(bool state)
+{
+	if(state) HAL_GPIO_WritePin(oneWire_PORT, oneWire_PIN, GPIO_PIN_SET);
+	else HAL_GPIO_WritePin(oneWire_PORT, oneWire_PIN, GPIO_PIN_RESET);
+}
+static bool ONE_WIRE_Pin_Read(void)
+{
+	return (1&HAL_GPIO_ReadPin(oneWire_PORT, oneWire_PIN));
 }
 
+//Microsecond delay
+static void DelayMicroSeconds(uint32_t uSec)
+{
+	uint32_t uSecVar = uSec;
+	uSecVar = uSecVar* ((SystemCoreClock/1000000)/3);
+	while(uSecVar--);
+}
+
+//DHT Begin function
+static void DHT22_StartAcquisition(void)
+{
+	//Change data pin mode to OUTPUT
+	ONE_WIRE_PinMode(ONE_OUTPUT);
+	//Put pin LOW
+	ONE_WIRE_Pin_Write(0);
+	//500uSec delay
+	DelayMicroSeconds(500);
+	//Bring pin HIGH
+	ONE_WIRE_Pin_Write(1);
+	//30 uSec delay
+	DelayMicroSeconds(30);
+	//Set pin as input
+	ONE_WIRE_PinMode(ONE_INPUT);
+}
+//Read 5 bytes
+static void DHT22_ReadRaw(uint8_t *data)
+{
+	uint32_t rawBits = 0UL;
+	uint8_t checksumBits=0;
+
+	DelayMicroSeconds(40);
+	while(!ONE_WIRE_Pin_Read());
+	while(ONE_WIRE_Pin_Read());
+	for(int8_t i=31; i>=0; i--)
+	{
+		while(!ONE_WIRE_Pin_Read());
+		DelayMicroSeconds(40);
+		if(ONE_WIRE_Pin_Read())
+		{
+			rawBits |= (1UL << i);
+		}
+		while(ONE_WIRE_Pin_Read());
+	}
+
+	for(int8_t i=7; i>=0; i--)
+	{
+		while(!ONE_WIRE_Pin_Read());
+		DelayMicroSeconds(40);
+		if(ONE_WIRE_Pin_Read())
+		{
+			checksumBits |= (1UL << i);
+		}
+		while(ONE_WIRE_Pin_Read());
+	}
+
+
+	//Copy raw data to array of bytes
+	data[0] = (rawBits>>24)&0xFF;
+	data[1] = (rawBits>>16)&0xFF;
+	data[2] = (rawBits>>8)&0xFF;
+	data[3] = (rawBits>>0)&0xFF;
+	data[4] = (checksumBits)&0xFF;
+}
+
+//Get Temperature and Humidity data
+bool DHT22_GetTemp_Humidity(float *Temp, float *Humidity)
+{
+	uint8_t dataArray[6], myChecksum;
+	uint16_t Temp16, Humid16;
+	//Implement Start data Aqcuisition routine
+	DHT22_StartAcquisition();
+	//Aqcuire raw data
+	DHT22_ReadRaw(dataArray);
+	//calculate checksum
+	myChecksum = 0;
+	for(uint8_t k=0; k<4; k++)
+	{
+		myChecksum += dataArray[k];
+	}
+	if(myChecksum == dataArray[4])
+	{
+		Temp16 = (dataArray[2] <<8) | dataArray[3];
+		Humid16 = (dataArray[0] <<8) | dataArray[1];
+
+		*Temp = Temp16/10.0f;
+		*Humidity = Humid16/10.0f;
+		return 1;
+	}
+	return 0;
+}

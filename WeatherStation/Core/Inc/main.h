@@ -58,9 +58,11 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define WATER_SENSOR_PIN_Pin GPIO_PIN_4
+#define WATER_SENSOR_PIN_GPIO_Port GPIOA
 #define LIGHT_SENSOR_PIN_Pin GPIO_PIN_5
 #define LIGHT_SENSOR_PIN_GPIO_Port GPIOC
-#define TEMP_HUM_SENSOR_PIN_Pin GPIO_PIN_0
+#define TEMP_HUM_SENSOR_PIN_Pin GPIO_PIN_4
 #define TEMP_HUM_SENSOR_PIN_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 

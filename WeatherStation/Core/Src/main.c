@@ -49,6 +49,8 @@ ADC_HandleTypeDef hadc1;
 I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c2;
 
+TIM_HandleTypeDef htim6;
+
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
@@ -62,6 +64,7 @@ static void MX_I2C1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_I2C2_Init(void);
+static void MX_TIM6_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* Function prototypes for LPS22HB communication */
@@ -73,14 +76,6 @@ void check_lps22hb_error(lps22hb_err_t err);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t Presence = 0;
-
-uint8_t Rh_byte1, Rh_byte2, Temp_byte1, Temp_byte2;
-uint16_t Parity, RH, TEMP;
-
-float temperature = 0;
-float humidity = 0;
-
 lps22hb_t lps22hb = LPS22HB_DEFAULT_REG_VALUES;
 
 /* USER CODE END 0 */
@@ -117,7 +112,13 @@ int main(void)
   MX_ADC1_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+
+  // Start Timer
+  HAL_TIM_Base_Start(&htim6);
+  // Initialize DHT22
+  DHT22_Init(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin);
 
   /* Setup LPS22HB */
   lps22hb.comm.read = lps22hb_read;
@@ -135,6 +136,8 @@ int main(void)
   float light = 0;
   float pressure = 0;
 
+  float TempC, Humidity;
+  char uartData[50];
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -158,19 +161,29 @@ int main(void)
 	printf("Pressure: %.3f hPa\r\n", pressure);
 	HAL_Delay(100);
 
-	/*DHT22_Start();
-	Presence = DHT22_Check_Response();
-	Rh_byte1 = DHT22_Read();
-	Rh_byte2 = DHT22_Read();
-	Temp_byte1 = DHT22_Read();
-	Temp_byte2 = DHT22_Read();
-	Parity = DHT22_Read();
 
-	TEMP = Temp_byte1;
-	RH = Rh_byte1;
+	if(!HAL_GPIO_ReadPin(WATER_SENSOR_PIN_GPIO_Port, WATER_SENSOR_PIN_Pin)){
+		printf("It's raining:( \r\n");
+	}
+	else{
+		printf("It's not raining:) \r\n");
+	}
 
-	temperature = (float)TEMP;
-	humidity = (float)RH;*/
+	/*
+	if(DHT22_GetTemp_Humidity(&TempC, &Humidity) == 1){
+		//sprintf(uartData, "\r\nTemp (C) =\t %.1f\r\nHumidity (%%) =\t %.1f%%\r\n", TempC, Humidity);
+		//HAL_UART_Transmit(&huart2, (uint8_t *)uartData, strlen(uartData), 10);
+		printf("Temperature: %.3f\r\n", TempC);
+		printf("Humidity: %.3f\r\n", Humidity);
+	}
+	else
+	{
+		//sprintf(uartData, "\r\nCRC Error!\r\n");
+		//HAL_UART_Transmit(&huart2, (uint8_t *)uartData, strlen(uartData), 10);
+		printf("DHT22 not responding:(");
+	}
+	*/
+	HAL_Delay(2000);
 
     /* USER CODE END WHILE */
 
@@ -204,7 +217,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 40;
+  RCC_OscInitStruct.PLL.PLLN = 25;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -221,7 +234,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
   {
     Error_Handler();
   }
@@ -307,7 +320,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x10909CEC;
+  hi2c1.Init.Timing = 0x00C0EAFF;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -353,7 +366,7 @@ static void MX_I2C2_Init(void)
 
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
-  hi2c2.Init.Timing = 0x10909CEC;
+  hi2c2.Init.Timing = 0x00C0EAFF;
   hi2c2.Init.OwnAddress1 = 0;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -380,6 +393,44 @@ static void MX_I2C2_Init(void)
   /* USER CODE BEGIN I2C2_Init 2 */
 
   /* USER CODE END I2C2_Init 2 */
+
+}
+
+/**
+  * @brief TIM6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM6_Init(void)
+{
+
+  /* USER CODE BEGIN TIM6_Init 0 */
+
+  /* USER CODE END TIM6_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM6_Init 1 */
+  // 50 in decimal is 0x32 in hex :)
+  /* USER CODE END TIM6_Init 1 */
+  htim6.Instance = TIM6;
+  htim6.Init.Prescaler = 50;
+  htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim6.Init.Period = 65535;
+  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM6_Init 2 */
+
+  /* USER CODE END TIM6_Init 2 */
 
 }
 
@@ -428,12 +479,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : WATER_SENSOR_PIN_Pin */
+  GPIO_InitStruct.Pin = WATER_SENSOR_PIN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(WATER_SENSOR_PIN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : TEMP_HUM_SENSOR_PIN_Pin */
   GPIO_InitStruct.Pin = TEMP_HUM_SENSOR_PIN_Pin;
@@ -441,12 +498,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(TEMP_HUM_SENSOR_PIN_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PD14 */
-  GPIO_InitStruct.Pin = GPIO_PIN_14;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 }
 
