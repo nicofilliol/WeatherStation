@@ -23,6 +23,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "DHT22.h"
+#include "lps22hb.h"
+#include "lps22hb_ex.h"
 #include "helper_functions.h"
 #include <stdio.h>
 /* USER CODE END Includes */
@@ -45,6 +47,7 @@
 ADC_HandleTypeDef hadc1;
 
 I2C_HandleTypeDef hi2c1;
+I2C_HandleTypeDef hi2c2;
 
 UART_HandleTypeDef huart1;
 
@@ -58,7 +61,13 @@ static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_I2C2_Init(void);
 /* USER CODE BEGIN PFP */
+
+/* Function prototypes for LPS22HB communication */
+lps22hb_err_t lps22hb_read(uint8_t reg, uint8_t *buf, uint8_t bytes);
+lps22hb_err_t lps22hb_write(uint8_t reg, uint8_t *buf, uint8_t bytes);
+void check_lps22hb_error(lps22hb_err_t err);
 
 /* USER CODE END PFP */
 
@@ -71,6 +80,9 @@ uint16_t Parity, RH, TEMP;
 
 float temperature = 0;
 float humidity = 0;
+
+lps22hb_t lps22hb = LPS22HB_DEFAULT_REG_VALUES;
+
 /* USER CODE END 0 */
 
 /**
@@ -104,8 +116,24 @@ int main(void)
   MX_I2C1_Init();
   MX_ADC1_Init();
   MX_USART1_UART_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
+
+  /* Setup LPS22HB */
+  lps22hb.comm.read = lps22hb_read;
+  lps22hb.comm.write= lps22hb_write;
+
+  printf("Setting up LPS22HB communication...\r\n");
+  if (lps22hb_check_communication(&lps22hb) != LPS22HB_SUCCESS) {
+	  printf("Error setting up LPS22HB communication...\r\n");
+  }
+
+  lps22hb.reg.ctrl_reg1.odr = LPS22HB_ODR_1Hz; // turns on the sensor
+  lps22hb_write_reg(&lps22hb, LPS22HB_CTRL_REG1);
+
+  /* Variables/Buffers */
   float light = 0;
+  float pressure = 0;
 
   /* USER CODE END 2 */
 
@@ -113,8 +141,21 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	/* PRESSURE SENSOR: LPS22HB */
+	// Read status registers
+	check_lps22hb_error(lps22hb_read_reg(&lps22hb, LPS22HB_STATUS));
+
+	if(lps22hb.reg.status.p_da){ //check if pressure data is available
+		check_lps22hb_error(lps22hb_get_press_data(&lps22hb, &pressure)); //read the data, and save in pressure as hPa
+	}
+
+	/* LIGHT SENSOR */
 	light = read_light_sensor(&hadc1, Error_Handler);
+
+
+	/* Print/Transmit Sensor Data */
 	printf("Light: %.3f\r\n", light);
+	printf("Pressure: %.3f hPa\r\n", pressure);
 	HAL_Delay(100);
 
 	/*DHT22_Start();
@@ -297,6 +338,52 @@ static void MX_I2C1_Init(void)
 }
 
 /**
+  * @brief I2C2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C2_Init(void)
+{
+
+  /* USER CODE BEGIN I2C2_Init 0 */
+
+  /* USER CODE END I2C2_Init 0 */
+
+  /* USER CODE BEGIN I2C2_Init 1 */
+
+  /* USER CODE END I2C2_Init 1 */
+  hi2c2.Instance = I2C2;
+  hi2c2.Init.Timing = 0x10909CEC;
+  hi2c2.Init.OwnAddress1 = 0;
+  hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c2.Init.OwnAddress2 = 0;
+  hi2c2.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C2_Init 2 */
+
+  /* USER CODE END I2C2_Init 2 */
+
+}
+
+/**
   * @brief USART1 Initialization Function
   * @param None
   * @retval None
@@ -364,6 +451,21 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+lps22hb_err_t lps22hb_read(uint8_t reg, uint8_t *buf, uint8_t bytes){
+	// Read address taken from schematics
+	return 	HAL_I2C_Mem_Read(&hi2c2, 0b10111011, reg, 1, buf, bytes, HAL_MAX_DELAY);
+}
+lps22hb_err_t lps22hb_write(uint8_t reg, uint8_t *buf, uint8_t bytes){
+	// Write address taken from schematics
+	return 	HAL_I2C_Mem_Write(&hi2c2, 0b10111010, reg, 1, buf, bytes, HAL_MAX_DELAY);
+}
+
+void check_lps22hb_error(lps22hb_err_t err) {
+	if (err != LPS22HB_SUCCESS) {
+		printf("LPS22HB error: %u\r\n", err);
+	}
+}
+
 
 /* USER CODE END 4 */
 

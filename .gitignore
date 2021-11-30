@@ -55,3 +55,6 @@ dkms.conf
 .DS_Store
 
 /.metadata
+WeatherStation/Debug/Drivers/STM32L4xx_HAL_Driver/Src/*.icloud
+WeatherStation/Debug/
+WeatherStation/.settings/

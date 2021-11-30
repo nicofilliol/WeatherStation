@@ -29,10 +29,11 @@ uint32_t read_adc(ADC_HandleTypeDef *hadc, void (*error_handler)()) {
 	return value;
 }
 
+/* Returns a light intensity as a fraction (0=complete darkness, 1=daylight) */
 float read_light_sensor(ADC_HandleTypeDef *hadc, void (*error_handler)()) {
 	uint32_t sensor_value = read_adc(hadc, error_handler);
 
 	// Convert raw ADC value to light value
-	float R_sensor = ((pow(2, ADC_BIT_RESOLUTION)-1) - sensor_value) * 10.0 / sensor_value;
+	float R_sensor = (float)sensor_value / (pow(2, ADC_BIT_RESOLUTION)-1);
 	return R_sensor;
 }
