@@ -163,10 +163,10 @@ int main(void)
 
 
 	if(!HAL_GPIO_ReadPin(WATER_SENSOR_PIN_GPIO_Port, WATER_SENSOR_PIN_Pin)){
-		printf("It's raining:( \r\n");
+		printf("It's raining :(\r\n");
 	}
 	else{
-		printf("It's not raining:) \r\n");
+		printf("It's not raining :)\r\n");
 	}
 
 	/*
