@@ -22,11 +22,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "DHT22.h"
 #include "lps22hb.h"
 #include "lps22hb_ex.h"
 #include "helper_functions.h"
 #include <stdio.h>
+#include "DHT.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -117,8 +117,6 @@ int main(void)
 
   // Start Timer
   HAL_TIM_Base_Start(&htim6);
-  // Initialize DHT22
-  DHT22_Init(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin);
 
   /* Setup LPS22HB */
   lps22hb.comm.read = lps22hb_read;
@@ -136,8 +134,9 @@ int main(void)
   float light = 0;
   float pressure = 0;
 
-  float TempC, Humidity;
-  char uartData[50];
+  DHT_DataTypedef DHT22_Data;
+  float temperature, humidity;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -159,9 +158,8 @@ int main(void)
 	/* Print/Transmit Sensor Data */
 	printf("Light: %.3f\r\n", light);
 	printf("Pressure: %.3f hPa\r\n", pressure);
-	HAL_Delay(100);
 
-
+	/* WATER SENSOR */
 	if(!HAL_GPIO_ReadPin(WATER_SENSOR_PIN_GPIO_Port, WATER_SENSOR_PIN_Pin)){
 		printf("It's raining :(\r\n");
 	}
@@ -169,21 +167,14 @@ int main(void)
 		printf("It's not raining :)\r\n");
 	}
 
-	/*
-	if(DHT22_GetTemp_Humidity(&TempC, &Humidity) == 1){
-		//sprintf(uartData, "\r\nTemp (C) =\t %.1f\r\nHumidity (%%) =\t %.1f%%\r\n", TempC, Humidity);
-		//HAL_UART_Transmit(&huart2, (uint8_t *)uartData, strlen(uartData), 10);
-		printf("Temperature: %.3f\r\n", TempC);
-		printf("Humidity: %.3f\r\n", Humidity);
-	}
-	else
-	{
-		//sprintf(uartData, "\r\nCRC Error!\r\n");
-		//HAL_UART_Transmit(&huart2, (uint8_t *)uartData, strlen(uartData), 10);
-		printf("DHT22 not responding:(");
-	}
-	*/
-	HAL_Delay(2000);
+	/* TEMPERATURE/HUMIDITY SENSOR */
+	DHT_GetData(&DHT22_Data);
+	temperature = DHT22_Data.Temperature;
+	humidity = DHT22_Data.Humidity;
+	printf("Temperature: %.3f\r\n", temperature);
+	printf("Humidity: %.3f\r\n", humidity);
+
+	HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 
@@ -484,7 +475,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : WATER_SENSOR_PIN_Pin */
   GPIO_InitStruct.Pin = WATER_SENSOR_PIN_Pin;
