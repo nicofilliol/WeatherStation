@@ -1,14 +1,12 @@
 /*
  * DHT.h
  *
- *  Created on: Jun 28, 2020
- *      Author: Controllerstech.com
+*  Created on: Dec 1, 2021
+ *      Author: joelasper
  */
 
 #ifndef DHT_H_
 #define DHT_H_
-
-
 
 typedef struct
 {

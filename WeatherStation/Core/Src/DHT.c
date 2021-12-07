@@ -5,9 +5,6 @@
  *      Author: joelasper
  */
 
-
-
-
 /************** MAKE CHANGES HERE ********************/
 #include "stm32l4xx_hal.h"
 
@@ -17,9 +14,6 @@
 
 #define DHT_PORT GPIOB
 #define DHT_PIN GPIO_PIN_4
-
-
-
 
 /*******************************************     NO CHANGES AFTER THIS LINE      ****************************************************/
 

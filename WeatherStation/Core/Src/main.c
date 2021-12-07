@@ -16,17 +16,27 @@
   *
   ******************************************************************************
   */
+
+/**
+ * Breakout Board Pins:
+ * A0: Light Sensor
+ * D5: Humidity Sensor
+ * D7: Water Sensor
+ */
+
+
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include "lps22hb.h"
 #include "lps22hb_ex.h"
 #include "helper_functions.h"
-#include <stdio.h>
 #include "DHT.h"
+#include "wifi.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -36,6 +46,15 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+#define WIFI_SSID ""
+#define WIFI_PASSPHRASE ""
+
+#define REMOTE_IP_ADDRESS "mqtt.thingspeak.com"
+#define SUBSCRIBE_TOPIC ""
+#define PUBLISH_TOPIC "channels/1592056/publish/PD94Y2ZCDA9FI8C7"
+
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,11 +68,16 @@ ADC_HandleTypeDef hadc1;
 I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c2;
 
+SPI_HandleTypeDef hspi3;
+
 TIM_HandleTypeDef htim6;
 
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
+
+/* WiFi handle */
+WIFI_HandleTypeDef hwifi;
 
 /* USER CODE END PV */
 
@@ -65,12 +89,16 @@ static void MX_ADC1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_TIM6_Init(void);
+static void MX_SPI3_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* Function prototypes for LPS22HB communication */
 lps22hb_err_t lps22hb_read(uint8_t reg, uint8_t *buf, uint8_t bytes);
 lps22hb_err_t lps22hb_write(uint8_t reg, uint8_t *buf, uint8_t bytes);
 void check_lps22hb_error(lps22hb_err_t err);
+
+/* Function prototypes for WiFi */
+void USR_WIFI_Init();
 
 /* USER CODE END PFP */
 
@@ -113,6 +141,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_I2C2_Init();
   MX_TIM6_Init();
+  MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
 
   // Start Timer
@@ -130,12 +159,17 @@ int main(void)
   lps22hb.reg.ctrl_reg1.odr = LPS22HB_ODR_1Hz; // turns on the sensor
   lps22hb_write_reg(&lps22hb, LPS22HB_CTRL_REG1);
 
+  /* Setup WiFi connection */
+  USR_WIFI_Init();
+
+
   /* Variables/Buffers */
   float light = 0;
   float pressure = 0;
 
   DHT_DataTypedef DHT22_Data;
   float temperature, humidity;
+  uint8_t water = 0;
 
   /* USER CODE END 2 */
 
@@ -160,7 +194,8 @@ int main(void)
 	printf("Pressure: %.3f hPa\r\n", pressure);
 
 	/* WATER SENSOR */
-	if(!HAL_GPIO_ReadPin(WATER_SENSOR_PIN_GPIO_Port, WATER_SENSOR_PIN_Pin)){
+	water = !HAL_GPIO_ReadPin(WATER_SENSOR_PIN_GPIO_Port, WATER_SENSOR_PIN_Pin);
+	if(water){
 		printf("It's raining :(\r\n");
 	}
 	else{
@@ -173,6 +208,14 @@ int main(void)
 	humidity = DHT22_Data.Humidity;
 	printf("Temperature: %.3f\r\n", temperature);
 	printf("Humidity: %.3f\r\n", humidity);
+
+	/* Send data over WiFI */
+	char payload[200];
+	snprintf(payload, 200, "field1=%.3f&field2=%.3f&field3=%d&field4=%.3f&field5=%.3f&status=MQTTPUBLISH", temperature, humidity, water, light, pressure);
+	printf(payload);
+	if(WIFI_MQTTPublish(&hwifi, payload, strlen(payload)) != WIFI_OK) {
+		printf("Error sending data to thingspeak.com...\r\n");
+	}
 
 	HAL_Delay(1000);
 
@@ -388,6 +431,46 @@ static void MX_I2C2_Init(void)
 }
 
 /**
+  * @brief SPI3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI3_Init(void)
+{
+
+  /* USER CODE BEGIN SPI3_Init 0 */
+
+  /* USER CODE END SPI3_Init 0 */
+
+  /* USER CODE BEGIN SPI3_Init 1 */
+
+  /* USER CODE END SPI3_Init 1 */
+  /* SPI3 parameter configuration*/
+  hspi3.Instance = SPI3;
+  hspi3.Init.Mode = SPI_MODE_MASTER;
+  hspi3.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi3.Init.DataSize = SPI_DATASIZE_16BIT;
+  hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi3.Init.NSS = SPI_NSS_SOFT;
+  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi3.Init.CRCPolynomial = 7;
+  hspi3.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
+  hspi3.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+  if (HAL_SPI_Init(&hspi3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI3_Init 2 */
+
+  /* USER CODE END SPI3_Init 2 */
+
+}
+
+/**
   * @brief TIM6 Initialization Function
   * @param None
   * @retval None
@@ -472,7 +555,11 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, WIFI_RESET_Pin|WIFI_NSS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(TEMP_HUM_SENSOR_PIN_GPIO_Port, TEMP_HUM_SENSOR_PIN_Pin, GPIO_PIN_SET);
@@ -483,12 +570,25 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(WATER_SENSOR_PIN_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : WIFI_RESET_Pin WIFI_NSS_Pin */
+  GPIO_InitStruct.Pin = WIFI_RESET_Pin|WIFI_NSS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
   /*Configure GPIO pin : TEMP_HUM_SENSOR_PIN_Pin */
   GPIO_InitStruct.Pin = TEMP_HUM_SENSOR_PIN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(TEMP_HUM_SENSOR_PIN_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : WIFI_CMD_DATA_READY_Pin */
+  GPIO_InitStruct.Pin = WIFI_CMD_DATA_READY_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(WIFI_CMD_DATA_READY_GPIO_Port, &GPIO_InitStruct);
 
 }
 
@@ -506,6 +606,39 @@ void check_lps22hb_error(lps22hb_err_t err) {
 	if (err != LPS22HB_SUCCESS) {
 		printf("LPS22HB error: %u\r\n", err);
 	}
+}
+
+void USR_WIFI_Init(){
+    printf("Initialising WiFi Module...\r\n");
+
+    //CONNECTION
+    hwifi.handle = &hspi3;
+    hwifi.ssid = WIFI_SSID;
+    hwifi.passphrase = WIFI_PASSPHRASE;
+    hwifi.securityType = WPA_MIXED;
+    hwifi.DHCP = SET;
+    hwifi.ipStatus = IP_V4;
+    hwifi.transportProtocol = WIFI_TCP_PROTOCOL;
+    hwifi.port = 8083;
+    hwifi.remotePort = 1883;
+
+    //MQTT
+    sprintf(hwifi.remoteIpAddress, REMOTE_IP_ADDRESS);
+    sprintf(hwifi.mqtt.clientId, "STM32");
+    sprintf(hwifi.mqtt.subscribeTopic, SUBSCRIBE_TOPIC);
+    sprintf(hwifi.mqtt.publishTopic, PUBLISH_TOPIC);
+    hwifi.mqtt.keepAlive = 3000;
+    hwifi.mqtt.securityMode = WIFI_MQTT_SECURITY_NONE;
+
+    // Intialise the driver and module:
+    WIFI_Init(&hwifi);
+
+    // Join the specified network:
+    WIFI_JoinNetwork(&hwifi);
+
+    // Connect to the MQTT broker:
+    WIFI_MQTTClientInit(&hwifi);
+    printf("Initialized!\r\n");
 }
 
 
