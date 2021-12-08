@@ -8,27 +8,99 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.2/dist/chart.min.js"></script>
 </head>
 <body>
-    <canvas id="lineChart" width="900" height="400"></canvas>
-    <script>
-        const ctx = document.getElementById('lineChart').getContext('2d');
-        const lineChart = new Chart(ctx, {
-            type: "line",
-            data: {
-                labels: {{ labels | safe }},
-                datasets: [
-                    {
-                        label: "Temperature",
-                        data: {{ values | safe }},
-                        fill: false,
-                        borderColor: "rgb(75, 192, 192)",
-                        lineTension: 0.1
+    <div> 
+        <canvas id="tempChart" width="600" height="200"></canvas>
+        <script>
+            const ctx1 = document.getElementById('tempChart').getContext('2d');
+            const lineChart = new Chart(ctx1, {
+                type: "line",
+                data: {
+                    labels: {{ labels_t | safe }},
+                    datasets: [
+                        {
+                            label: "Temperature",
+                            data: {{ temperature | safe }},
+                            fill: false,
+                            borderColor: "rgb(255, 99, 132)",
+                            lineTension: 0.1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: "Humidity",
+                            data: {{ humidity | safe }},
+                            fill: false,
+                            borderColor: "rgb(75, 192, 192)",
+                            lineTension: 0.1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Temperature & Humidity'
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left'
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false
+                        }
                     }
-                ]
-            },
-            options: {
-                responsive: false
-            }
-        });
-    </script>
+                }
+                }
+            });
+        </script>
+    </div> 
+    <div> 
+        <canvas id="pressureChart" width="600" height="200"></canvas>
+        <script>
+            const ctx2 = document.getElementById('pressureChart').getContext('2d');
+            const lineChart = new Chart(ctx2, {
+                type: "line",
+                data: {
+                    labels: {{ labels_p | safe }},
+                    datasets: [
+                        {
+                            label: "Pressure",
+                            data: {{ pressure | safe }},
+                            fill: false,
+                            borderColor: "rgb(255, 99, 132)",
+                            lineTension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Pressure'
+                        }
+                    }
+                }
+            });
+        </script>
+    </div> 
 </body>
 </html>
