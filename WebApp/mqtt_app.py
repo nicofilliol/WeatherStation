@@ -12,6 +12,8 @@ def handle_connect(client, userdata, flags, rc):
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
+    global new_data_flag
+    
     data = dict(
         topic=message.topic,
         payload=message.payload.decode()
@@ -28,6 +30,8 @@ def handle_mqtt_message(client, userdata, message):
     water_queue.append((timestamp, payload["water"]))
     light_queue.append((timestamp, payload["light"]))
     pressure_queue.append((timestamp, payload["pressure"]))
+
+    new_data_flag = True
 
     print("Received data...")
 

@@ -11,6 +11,7 @@ temperature_queue = deque(maxlen=500)
 water_queue = deque(maxlen=500)
 light_queue = deque(maxlen=500)
 pressure_queue = deque(maxlen=500)
+new_data_flag = False
 
 app = Flask(__name__)
 app.config["DEBUG"] = True

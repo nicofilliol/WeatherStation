@@ -1,3 +1,9 @@
+const eventSource = new EventSource("/stream")
+
+eventSource.onmessage = function(event) {
+    let data = event.data;
+};
+
 function init_temp(labels, temperature, humidity) {
     const ctx1 = document.getElementById('tempChart').getContext('2d');
     const lineChart = new Chart(ctx1, {
