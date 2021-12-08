@@ -12,11 +12,25 @@
     <div> 
         <canvas id="tempChart" width="600" height="200"></canvas>
         <canvas id="pressureChart" width="600" height="200"></canvas>
+        <canvas id="lightChart" width="600" height="200"></canvas>
+        <canvas id="waterChart" width="600" height="200"></canvas>
+
         <script type="text/javascript" src="{{ url_for('static', filename='temperature.js') }}" ></script>
         <script type="text/javascript"> 
             init_temp({{ labels_t | safe }}, {{ temperature | safe }}, {{ humidity | safe }});
         </script>
+
         <script type="text/javascript" src="{{ url_for('static', filename='pressure.js') }}" ></script>
+        <script type="text/javascript"> 
+            init_temp({{ labels_p | safe }}, {{ pressure | safe }},);
+        </script>
+
+        <script type="text/javascript" src="{{ url_for('static', filename='light.js') }}" ></script>
+        <script type="text/javascript"> 
+            init_temp({{ labels_p | safe }}, {{ pressure | safe }},);
+        </script>
+
+        <script type="text/javascript" src="{{ url_for('static', filename='water.js') }}" ></script>
         <script type="text/javascript"> 
             init_temp({{ labels_p | safe }}, {{ pressure | safe }},);
         </script>

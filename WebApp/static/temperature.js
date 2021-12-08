@@ -27,7 +27,7 @@ function init_temp(labels, temperature, humidity) {
             responsive: false,
             plugins: {
                 legend: {
-                    position: 'right',
+                    position: 'bottom',
                 },
                 title: {
                     display: true,
@@ -42,7 +42,11 @@ function init_temp(labels, temperature, humidity) {
             y: {
                 type: 'linear',
                 display: true,
-                position: 'left'
+                position: 'left',
+                title: {
+                    display: true,
+                    text: '°C'
+                }
             },
             y1: {
                 type: 'linear',
@@ -50,6 +54,10 @@ function init_temp(labels, temperature, humidity) {
                 position: 'right',
                 grid: {
                     drawOnChartArea: false
+                },
+                title: {
+                    display: true,
+                    text: 'hPa'
                 }
             }
         }
