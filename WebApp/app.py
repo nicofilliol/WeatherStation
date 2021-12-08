@@ -2,8 +2,24 @@ from flask import render_template, request
 from header import *
 import mqtt_app
 
-@app.route("/")
+
+@app.route("/", methods=["GET", "POST"])
 def home():
+    data_temperature = list(temperature_queue)
+    data_humidity = list(humidity_queue)
+    data_pressure = list(pressure_queue)
+
+    labels_t = [row[0] for row in data_temperature]
+    temperature = [row[1] for row in data_temperature]
+    humidity = [row[1] for row in data_humidity]
+
+    labels_p = [row[0] for row in data_pressure]
+    pressure = [row[1] for row in data_pressure]
+
+    return render_template("graph.html", labels_t=labels_t, temperature=temperature, humidity=humidity, labels_p=labels_p, pressure=pressure)
+
+@app.route("/demo")
+def demoGraph():
     data_pressure = [
         ("11:00",12),
         ("12:00",12.2),
@@ -21,20 +37,6 @@ def home():
     
     return render_template("index.html", labels=labels, pressure=pressure)
 
-@app.route("/line", methods=["GET", "POST"])
-def line():
-    data_temperature = list(temperature_queue)
-    data_humidity = list(humidity_queue)
-    data_pressure = list(pressure_queue)
-
-    labels_t = [row[0] for row in data_temperature]
-    temperature = [row[1] for row in data_temperature]
-    humidity = [row[1] for row in data_humidity]
-
-    labels_p = [row[0] for row in data_pressure]
-    pressure = [row[1] for row in data_pressure]
-
-    return render_template("graph.html", labels_t=labels_t, temperature=temperature, humidity=humidity, labels_p=labels_p, pressure=pressure)
 
 if __name__ == '__main__':
     mqtt.init_app(app)
