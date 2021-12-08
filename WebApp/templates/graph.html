@@ -10,64 +10,7 @@
 <body>
     <div> 
         <canvas id="tempChart" width="600" height="200"></canvas>
-        <script>
-            const ctx1 = document.getElementById('tempChart').getContext('2d');
-            const lineChart = new Chart(ctx1, {
-                type: "line",
-                data: {
-                    labels: {{ labels_t | safe }},
-                    datasets: [
-                        {
-                            label: "Temperature",
-                            data: {{ temperature | safe }},
-                            fill: false,
-                            borderColor: "rgb(255, 99, 132)",
-                            lineTension: 0.1,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: "Humidity",
-                            data: {{ humidity | safe }},
-                            fill: false,
-                            borderColor: "rgb(75, 192, 192)",
-                            lineTension: 0.1,
-                            yAxisID: 'y1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Temperature & Humidity'
-                        }
-                    },
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    scales: {
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left'
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        grid: {
-                            drawOnChartArea: false
-                        }
-                    }
-                }
-                }
-            });
-        </script>
+        <script src="{{ static/temperature.js }}"> init_temp({{ labels_t | safe }}, {{ temperature | safe }}, {{ humidity | safe }})</script>
     </div> 
     <div> 
         <canvas id="pressureChart" width="600" height="200"></canvas>
