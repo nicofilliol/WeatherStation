@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.2/dist/chart.min.js"></script>
     <link rel="icon" href="data:;base64,="> <!-- Do not load any favicon -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 </head>
 <body>
 <nav class="navbar navbar-light bg-light">
@@ -20,13 +21,17 @@
 </nav>
     <div class="container">
         <div class="row">
-            <div class="col">
-                <canvas id="tempChart" width="600" height="200"></canvas>
-                <canvas id="pressureChart" width="600" height="200"></canvas>
+            <div class="col-sm-12 col-md-6">
+                <canvas id="tempChart" width="600" height="300"></canvas>
             </div>
-            <div class="col">
-                <canvas id="lightChart" width="600" height="200"></canvas>
-                <canvas id="waterChart" width="600" height="200"></canvas>
+            <div class="col-sm-12 col-md-6">
+                <canvas id="pressureChart" width="600" height="300"></canvas>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <canvas id="lightChart" width="600" height="300"></canvas>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <canvas id="waterChart" width="600" height="300"></canvas>
             </div>
         </div>
     </div> 
