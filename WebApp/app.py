@@ -1,7 +1,9 @@
-from flask import Flask, render_template
+from flask import render_template
+from header import app, mqtt, SUBSCRIPTION_TOPIC
+import mqtt_app
 
-app = Flask(__name__)
-app.config["DEBUG"] = True
+
+
 
 @app.route("/")
 def home():
@@ -41,4 +43,6 @@ def line():
 
 
 if __name__ == '__main__':
+    mqtt.init_app(app)
+    print("Initialized MQTT...")
     app.run(host="localhost", port=8000, debug=True)

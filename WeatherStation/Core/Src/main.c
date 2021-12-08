@@ -47,12 +47,12 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define WIFI_SSID ""
-#define WIFI_PASSPHRASE ""
+#define WIFI_SSID "iPhone von Nicolas"
+#define WIFI_PASSPHRASE "gritibenz"
 
-#define REMOTE_IP_ADDRESS "mqtt.thingspeak.com"
+#define REMOTE_IP_ADDRESS "broker.hivemq.com"
 #define SUBSCRIBE_TOPIC ""
-#define PUBLISH_TOPIC "channels/1592056/publish/PD94Y2ZCDA9FI8C7"
+#define PUBLISH_TOPIC "ethz/weather_station"
 
 
 /* USER CODE END PD */
@@ -67,6 +67,8 @@ ADC_HandleTypeDef hadc1;
 
 I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c2;
+
+IWDG_HandleTypeDef hiwdg;
 
 SPI_HandleTypeDef hspi3;
 
@@ -90,6 +92,7 @@ static void MX_USART1_UART_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_TIM6_Init(void);
 static void MX_SPI3_Init(void);
+static void MX_IWDG_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* Function prototypes for LPS22HB communication */
@@ -142,6 +145,7 @@ int main(void)
   MX_I2C2_Init();
   MX_TIM6_Init();
   MX_SPI3_Init();
+  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
 
   // Start Timer
@@ -209,13 +213,16 @@ int main(void)
 	printf("Temperature: %.3f\r\n", temperature);
 	printf("Humidity: %.3f\r\n", humidity);
 
-	/* Send data over WiFI */
+	/* Send data over WiFi */
 	char payload[200];
-	snprintf(payload, 200, "field1=%.3f&field2=%.3f&field3=%d&field4=%.3f&field5=%.3f&status=MQTTPUBLISH", temperature, humidity, water, light, pressure);
-	printf(payload);
+	snprintf(payload, 200, "{ \"temperature\": %.4f, \"humidity\": %.4f, \"water\": %d, \"light\": %.4f, \"pressure\": %.4f }", temperature, humidity, water, light, pressure);
+	printf("%s\r\n", payload);
 	if(WIFI_MQTTPublish(&hwifi, payload, strlen(payload)) != WIFI_OK) {
-		printf("Error sending data to thingspeak.com...\r\n");
+		printf("Error sending data to MQTT broker...\r\n");
 	}
+
+	/* Reset watchdog timer */
+	HAL_IWDG_Refresh(&hiwdg);
 
 	HAL_Delay(1000);
 
@@ -244,7 +251,8 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = 0;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
@@ -427,6 +435,35 @@ static void MX_I2C2_Init(void)
   /* USER CODE BEGIN I2C2_Init 2 */
 
   /* USER CODE END I2C2_Init 2 */
+
+}
+
+/**
+  * @brief IWDG Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_IWDG_Init(void)
+{
+
+  /* USER CODE BEGIN IWDG_Init 0 */
+
+  /* USER CODE END IWDG_Init 0 */
+
+  /* USER CODE BEGIN IWDG_Init 1 */
+
+  /* USER CODE END IWDG_Init 1 */
+  hiwdg.Instance = IWDG;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
+  hiwdg.Init.Window = 2500;
+  hiwdg.Init.Reload = 2500;
+  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN IWDG_Init 2 */
+
+  /* USER CODE END IWDG_Init 2 */
 
 }
 
