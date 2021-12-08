@@ -1,6 +1,8 @@
-function init_temp(labels, pressure) {
+var lineChart_pressure;
+
+function init_pressure(labels, pressure) {
     const ctx2 = document.getElementById('pressureChart').getContext('2d');
-    const lineChart = new Chart(ctx2, {
+    lineChart_pressure = new Chart(ctx2, {
         type: "line",
         data: {
             labels: labels,

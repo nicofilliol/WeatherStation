@@ -1,6 +1,8 @@
-function init_temp(labels, water) {
+var lineChart_water;
+
+function init_water(labels, water) {
     const ctx2 = document.getElementById('waterChart').getContext('2d');
-    const lineChart = new Chart(ctx2, {
+    lineChart_water = new Chart(ctx2, {
         type: "line",
         data: {
             labels: labels,

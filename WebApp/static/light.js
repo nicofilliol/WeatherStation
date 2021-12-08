@@ -1,6 +1,8 @@
-function init_temp(labels, light) {
+var lineChart_light;
+
+function init_light(labels, light) {
     const ctx2 = document.getElementById('lightChart').getContext('2d');
-    const lineChart = new Chart(ctx2, {
+    lineChart_light = new Chart(ctx2, {
         type: "line",
         data: {
             labels: labels,
