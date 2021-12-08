@@ -1,13 +1,13 @@
-function init_temp(labels, pressure) {
-    const ctx2 = document.getElementById('pressureChart').getContext('2d');
+function init_temp(labels, light) {
+    const ctx2 = document.getElementById('lightChart').getContext('2d');
     const lineChart = new Chart(ctx2, {
         type: "line",
         data: {
             labels: labels,
             datasets: [
                 {
-                    label: "Pressure",
-                    data: pressure,
+                    label: "Light",
+                    data: light,
                     fill: false,
                     borderColor: "rgb(255, 99, 132)",
                     lineTension: 0.1,
@@ -24,7 +24,7 @@ function init_temp(labels, pressure) {
                 },
                 title: {
                     display: true,
-                    text: 'Pressure'
+                    text: 'Light'
                 }
             },
             scales: {
@@ -34,7 +34,7 @@ function init_temp(labels, pressure) {
                     position: 'left',
                     title: {
                         display: true,
-                        text: 'hPa'
+                        text: '??'
                     }
                 },
             }

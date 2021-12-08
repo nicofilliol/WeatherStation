@@ -48,7 +48,11 @@ function init_temp(labels, temperature, humidity) {
             y: {
                 type: 'linear',
                 display: true,
-                position: 'left'
+                position: 'left',
+                title: {
+                    display: true,
+                    text: '°C'
+                }
             },
             y1: {
                 type: 'linear',
@@ -56,6 +60,10 @@ function init_temp(labels, temperature, humidity) {
                 position: 'right',
                 grid: {
                     drawOnChartArea: false
+                },
+                title: {
+                    display: true,
+                    text: '%'
                 }
             }
         }
