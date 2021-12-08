@@ -7,33 +7,50 @@
     <title>Weather Station</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.2/dist/chart.min.js"></script>
     <link rel="icon" href="data:;base64,="> <!-- Do not load any favicon -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 </head>
 <body>
-    <div> 
-        <canvas id="tempChart" width="600" height="200"></canvas>
-        <canvas id="pressureChart" width="600" height="200"></canvas>
-        <canvas id="lightChart" width="600" height="200"></canvas>
-        <canvas id="waterChart" width="600" height="200"></canvas>
-
-        <script type="text/javascript" src="{{ url_for('static', filename='temperature.js') }}" ></script>
-        <script type="text/javascript"> 
-            init_temp({{ labels_t | safe }}, {{ temperature | safe }}, {{ humidity | safe }});
-        </script>
-
-        <script type="text/javascript" src="{{ url_for('static', filename='pressure.js') }}" ></script>
-        <script type="text/javascript"> 
-            init_temp({{ labels_p | safe }}, {{ pressure | safe }},);
-        </script>
-
-        <script type="text/javascript" src="{{ url_for('static', filename='light.js') }}" ></script>
-        <script type="text/javascript"> 
-            init_temp({{ labels_p | safe }}, {{ pressure | safe }},);
-        </script>
-
-        <script type="text/javascript" src="{{ url_for('static', filename='water.js') }}" ></script>
-        <script type="text/javascript"> 
-            init_temp({{ labels_p | safe }}, {{ pressure | safe }},);
-        </script>
+<nav class="navbar navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <img src="static/pictures/clear-day.svg" alt="" width="60" height="30" class="d-inline-block align-text-top">
+      Weather Station
+    </a>
+  </div>
+</nav>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <canvas id="tempChart" width="600" height="200"></canvas>
+                <canvas id="pressureChart" width="600" height="200"></canvas>
+            </div>
+            <div class="col">
+                <canvas id="lightChart" width="600" height="200"></canvas>
+                <canvas id="waterChart" width="600" height="200"></canvas>
+            </div>
+        </div>
     </div> 
-</body>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='temperature.js') }}" ></script>
+    <script type="text/javascript"> 
+        init_temp({{ labels_t | safe }}, {{ temperature | safe }}, {{ humidity | safe }});
+    </script>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='pressure.js') }}" ></script>
+    <script type="text/javascript"> 
+        init_temp({{ labels_p | safe }}, {{ pressure | safe }},);
+    </script>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='light.js') }}" ></script>
+    <script type="text/javascript"> 
+        init_temp({{ labels_p | safe }}, {{ pressure | safe }},);
+    </script>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='water.js') }}" ></script>
+    <script type="text/javascript"> 
+        init_temp({{ labels_p | safe }}, {{ pressure | safe }},);
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    </body>
 </html>

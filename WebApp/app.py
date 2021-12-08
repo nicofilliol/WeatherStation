@@ -39,4 +39,4 @@ def line():
 if __name__ == '__main__':
     mqtt.init_app(app)
     print("Initialized MQTT...")
-    app.run(host="localhost", port=8000, debug=True)
+    app.run(debug=True)

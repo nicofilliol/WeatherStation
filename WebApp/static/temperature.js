@@ -57,7 +57,7 @@ function init_temp(labels, temperature, humidity) {
                 },
                 title: {
                     display: true,
-                    text: 'hPa'
+                    text: '%'
                 }
             }
         }

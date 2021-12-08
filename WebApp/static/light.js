@@ -16,7 +16,7 @@ function init_temp(labels, light) {
             ]
         },
         options: {
-            responsive: false,
+            responsive: true,
             plugins: {
                 legend: {
                     display: false,
