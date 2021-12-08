@@ -8,7 +8,7 @@ def get_message():
     """Block until new data is available"""
     global new_data_flag
 
-    while not new_data_flag:
+    while not new_data_flag.ready():
         time.sleep(0.1)
 
     # New data avalaible
@@ -36,7 +36,7 @@ def get_message():
         }
     
     json_data = json.dumps(data)
-    new_data_flag = False
+    new_data_flag.set_state(False)
     return json_data
 
 
@@ -74,13 +74,12 @@ def demoGraph():
     
     return render_template("index.html", labels=labels, pressure=pressure)
 
-
 @app.route("/stream")
 def stream():
     def eventStream():
         while True:
             # wait for source data to be available, then push it
-            yield get_message()
+            yield f"data: {get_message()}\n\n"
     return Response(eventStream(), mimetype="text/event-stream")
 
 if __name__ == '__main__':

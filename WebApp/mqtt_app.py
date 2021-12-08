@@ -13,7 +13,7 @@ def handle_connect(client, userdata, flags, rc):
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
     global new_data_flag
-    
+
     data = dict(
         topic=message.topic,
         payload=message.payload.decode()
@@ -31,11 +31,7 @@ def handle_mqtt_message(client, userdata, message):
     light_queue.append((timestamp, payload["light"]))
     pressure_queue.append((timestamp, payload["pressure"]))
 
-    new_data_flag = True
-
-    print("Received data...")
-
-    res = requests.post('http://localhost:8000/line')
+    new_data_flag.set_state(True)
 
 @mqtt.on_log()
 def handle_logging(client, userdata, level, buf):
