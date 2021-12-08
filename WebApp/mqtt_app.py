@@ -23,7 +23,7 @@ def handle_mqtt_message(client, userdata, message):
     # Add data to queue
 
     now = datetime.now()
-    timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = now.strftime("%H:%M:%S")
 
     temperature_queue.append((timestamp, payload["temperature"]))
     humidity_queue.append((timestamp, payload["humidity"]))
