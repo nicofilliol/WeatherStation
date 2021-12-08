@@ -24,10 +24,10 @@ function init_temp(labels, temperature, humidity) {
             ]
         },
         options: {
-            responsive: false,
+            responsive: true,
             plugins: {
                 legend: {
-                    position: 'right',
+                    position: 'bottom',
                 },
                 title: {
                     display: true,
