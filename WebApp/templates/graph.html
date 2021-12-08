@@ -14,7 +14,7 @@
         const lineChart = new Chart(ctx, {
             type: "line",
             data: {
-                labels: {{ labels | safe }}
+                labels: {{ labels | safe }},
                 datasets: [
                     {
                         label: "Temperature",
