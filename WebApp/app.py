@@ -45,6 +45,8 @@ def home():
     data_temperature = list(temperature_queue)
     data_humidity = list(humidity_queue)
     data_pressure = list(pressure_queue)
+    data_light = list(light_queue)
+    data_water = list(water_queue)
 
     labels_t = [row[0] for row in data_temperature]
     temperature = [row[1] for row in data_temperature]
@@ -53,7 +55,22 @@ def home():
     labels_p = [row[0] for row in data_pressure]
     pressure = [row[1] for row in data_pressure]
 
-    return render_template("graph.html", labels_t=labels_t, temperature=temperature, humidity=humidity, labels_p=labels_p, pressure=pressure)
+    labels_l = [row[0] for row in data_light]
+    light = [row[1] for row in data_light]
+
+    labels_w = [row[0] for row in data_water]
+    water = [row[1] for row in data_water]
+
+    if len(temperature)>0:
+        t_now = temperature[-1]
+    else:
+        t_now = ""
+    if len(pressure)>0:
+        p_now = pressure[-1]
+    else:
+        p_now = ""
+
+    return render_template("graph.html", temperature_now=t_now, pressure_now=p_now, labels_t=labels_t, temperature=temperature, humidity=humidity, labels_p=labels_p, pressure=pressure, labels_l=labels_l, light=light, labels_w=labels_w, water=water)
 
 @app.route("/demo")
 def demoGraph():
