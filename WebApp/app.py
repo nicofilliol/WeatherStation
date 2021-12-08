@@ -69,7 +69,7 @@ def line():
     labels_p = [row[0] for row in data_pressure]
     pressure = [row[1] for row in data_pressure]
 
-    return render_template("graph.html", labels_t=labels_t, temperature=temperature, humidity=humidity)
+    return render_template("graph.html", labels_t=labels_t, temperature=temperature, humidity=humidity, labels_p=labels_p, pressure=pressure)
 
 
 if __name__ == '__main__':
