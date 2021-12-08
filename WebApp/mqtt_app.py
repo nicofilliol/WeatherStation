@@ -2,6 +2,7 @@ from header import *
 from flask_mqtt import MQTT_LOG_ERR
 import json
 from datetime import datetime
+import requests
 
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
@@ -27,6 +28,10 @@ def handle_mqtt_message(client, userdata, message):
     water_queue.append((timestamp, payload["water"]))
     light_queue.append((timestamp, payload["light"]))
     pressure_queue.append((timestamp, payload["pressure"]))
+
+    print("Received data...")
+
+    res = requests.post('http://localhost:8000/line')
 
 @mqtt.on_log()
 def handle_logging(client, userdata, level, buf):
