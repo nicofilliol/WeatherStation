@@ -1,4 +1,4 @@
-function init_temp(labels, temperature, humidity){
+function init_temp(labels, temperature, humidity) {
     const ctx1 = document.getElementById('tempChart').getContext('2d');
     const lineChart = new Chart(ctx1, {
         type: "line",

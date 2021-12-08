@@ -55,6 +55,7 @@ dkms.conf
 .DS_Store
 WebApp/__pycache__
 .vscode
+tempCodeRunnerFile.py
 
 /.metadata
 WeatherStation/Debug/Drivers/STM32L4xx_HAL_Driver/Src/*.icloud
