@@ -47,8 +47,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define WIFI_SSID "iPhone von Nicolas"
-#define WIFI_PASSPHRASE "gritibenz"
+#define WIFI_SSID ""
+#define WIFI_PASSPHRASE ""
 
 #define REMOTE_IP_ADDRESS "broker.hivemq.com"
 #define SUBSCRIBE_TOPIC ""
