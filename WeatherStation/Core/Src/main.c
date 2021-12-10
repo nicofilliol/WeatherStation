@@ -20,7 +20,7 @@
 /**
  * Breakout Board Pins:
  * A0: Light Sensor
- * D5: Humidity Sensor
+ * D5: Temperature/Humidity Sensor
  * D7: Water Sensor
  */
 
@@ -224,7 +224,7 @@ int main(void)
 	/* Reset watchdog timer */
 	HAL_IWDG_Refresh(&hiwdg);
 
-	HAL_Delay(1000);
+	HAL_Delay(5000);
 
     /* USER CODE END WHILE */
 
