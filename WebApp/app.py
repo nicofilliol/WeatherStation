@@ -4,6 +4,9 @@ from mqtt_app import *
 import json
 import time
 
+init_mqtt()
+print("Initialized MQTT...")
+
 def get_message():
     """Block until new data is available"""
     global new_data_flag
@@ -100,6 +103,4 @@ def stream():
     return Response(eventStream(), mimetype="text/event-stream")
 
 if __name__ == '__main__':
-    init_mqtt()
-    print("Initialized MQTT...")
     app.run(debug=True)
