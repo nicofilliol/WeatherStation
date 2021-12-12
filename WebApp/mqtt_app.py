@@ -2,8 +2,6 @@ from header import *
 import json
 from datetime import datetime
 import paho.mqtt.client as mqtt
-import urllib, os, configparser
-
 
 # Define event callbacks
 def on_connect(client, userdata, flags, rc):
@@ -53,33 +51,14 @@ def init_mqtt():
     # Uncomment to enable debug messages
     #mqttc.on_log = on_log
 
-    # Setup Flask and MQTT Client
-    if os.path.isfile("WebApp/mqtt.config"):
-        config = configparser.ConfigParser()
-        config.read('WebApp/mqtt.config')
-        mqtt_details = dict(config.items('MQTT'))
-    else: # File does not exist, check environment variables
-        # Parse CLOUDMQTT_URL (or fallback to localhost)
-        url_str = os.environ.get('CLOUDMQTT_URL')
-        url = urllib.parse.urlparse(url_str)
-
-        mqtt_details = {
-            "hostname" : url.hostname,
-            "port" : url.port,
-            "username" : url.username,
-            "password" : url.password,
-            "subscribe_topic" : os.environ.get('SUB_TOPIC'),
-            "publish_topic" : os.environ.get('PUB_TOPIC')
-        }
-    
-
+    # Setup MQTT Client
     mqtt_details = {
         "hostname" : "broker.hivemq.com",
         "port" : 1883,
         "username" : "",
         "password" : "",
         "subscribe_topic" : "ethz/weather_station",
-        "publish_topic" : "test"
+        "publish_topic" : "ethz/weather_station/publish"
     }
 
     # Connect
