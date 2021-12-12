@@ -1,6 +1,6 @@
 from flask import render_template, request, Response
 from header import *
-import mqtt_app
+from mqtt_app import *
 import json
 import time
 
@@ -100,6 +100,6 @@ def stream():
     return Response(eventStream(), mimetype="text/event-stream")
 
 if __name__ == '__main__':
-    mqtt.init_app(app)
+    init_mqtt()
     print("Initialized MQTT...")
     app.run(debug=True)
