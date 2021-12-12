@@ -46,6 +46,7 @@ else: # File does not exist, check environment variables
         "publish_topic" : os.environ.get('PUB_TOPIC')
     }
 
+print("Trying to connect to MQTT client...")
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['MQTT_BROKER_URL'] = mqtt_details['ip_address']
