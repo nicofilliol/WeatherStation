@@ -61,3 +61,6 @@ tempCodeRunnerFile.py
 WeatherStation/Debug/Drivers/STM32L4xx_HAL_Driver/Src/*.icloud
 WeatherStation/Debug/
 WeatherStation/.settings/
+WeatherStation/Core/Inc/mqtt_config.h
+
+WebApp/mqtt.config
