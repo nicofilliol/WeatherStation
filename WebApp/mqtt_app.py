@@ -71,6 +71,16 @@ def init_mqtt():
             "subscribe_topic" : os.environ.get('SUB_TOPIC'),
             "publish_topic" : os.environ.get('PUB_TOPIC')
         }
+    
+
+    mqtt_details = {
+        "hostname" : "broker.hivemq.com",
+        "port" : 1883,
+        "username" : "",
+        "password" : "",
+        "subscribe_topic" : "ethz/weather_station",
+        "publish_topic" : "test"
+    }
 
     # Connect
     mqttc.username_pw_set(mqtt_details["username"], mqtt_details["password"])
