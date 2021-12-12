@@ -36,7 +36,7 @@ function init_light(labels, light) {
                     position: 'left',
                     title: {
                         display: true,
-                        text: '??'
+                        text: 'Intensity'
                     }
                 },
             }

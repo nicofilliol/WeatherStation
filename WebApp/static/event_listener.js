@@ -25,4 +25,7 @@ eventSource.onmessage = function(event) {
     lineChart_pressure.data.labels = event_data.pressure.time;
     lineChart_pressure.data.datasets[0].data = event_data.pressure.data;
     lineChart_pressure.update();
+
+    document.getElementById("temp_now").innerHTML = "Temperature: " + event_data.temperature.data.slice(-1)[0] + "°C";
+    document.getElementById("press_now").innerHTML = "Pressure: " + event_data.pressure.data.slice(-1)[0] + " hPa";
 };

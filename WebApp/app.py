@@ -64,16 +64,7 @@ def home():
     labels_w = [row[0] for row in data_water]
     water = [row[1] for row in data_water]
 
-    if len(temperature)>0:
-        t_now = temperature[-1]
-    else:
-        t_now = ""
-    if len(pressure)>0:
-        p_now = pressure[-1]
-    else:
-        p_now = ""
-
-    return render_template("graph.html", temperature_now=t_now, pressure_now=p_now, labels_t=labels_t, temperature=temperature, humidity=humidity, labels_p=labels_p, pressure=pressure, labels_l=labels_l, light=light, labels_w=labels_w, water=water)
+    return render_template("graph.html", labels_t=labels_t, temperature=temperature, humidity=humidity, labels_p=labels_p, pressure=pressure, labels_l=labels_l, light=light, labels_w=labels_w, water=water)
 
 @app.route("/demo")
 def demoGraph():
