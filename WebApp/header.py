@@ -2,6 +2,8 @@ from flask import Flask, render_template
 from flask_mqtt import Mqtt
 from collections import deque
 import configparser
+import os
+import urllib   
 
 # Helper class for flag
 class Ready_Flag():
@@ -26,9 +28,23 @@ pressure_queue = deque(maxlen=500)
 new_data_flag = Ready_Flag(False)
 
 # Setup Flask and MQTT Client
-config = configparser.ConfigParser()
-config.read('WebApp/mqtt.config')
-mqtt_details = dict(config.items('MQTT'))
+if os.path.isfile("WebApp/mqtt.config"):
+    config = configparser.ConfigParser()
+    config.read('WebApp/mqtt.config')
+    mqtt_details = dict(config.items('MQTT'))
+else: # File does not exist, check environment variables
+    url_str = os.environ.get('CLOUDMQTT_URL')
+    url = urllib.parse.urlparse(url_str)
+
+
+    mqtt_details = {
+        "ip_address" : url.hostname,
+        "port" : url.port,
+        "username" : url.username,
+        "password" : url.password,
+        "subscribe_topic" : os.environ.get('SUB_TOPIC'),
+        "publish_topic" : os.environ.get('PUB_TOPIC')
+    }
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
