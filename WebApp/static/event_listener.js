@@ -26,6 +26,26 @@ eventSource.onmessage = function(event) {
     lineChart_pressure.data.datasets[0].data = event_data.pressure.data;
     lineChart_pressure.update();
 
-    document.getElementById("temp_now").innerHTML = "Temperature: " + event_data.temperature.data.slice(-1)[0] + "°C";
-    document.getElementById("press_now").innerHTML = "Pressure: " + event_data.pressure.data.slice(-1)[0] + " hPa";
+
+    // Live temperature data
+    const temp = event_data.temperature.data.slice(-1)[0]
+    const pressure = event_data.pressure.data.slice(-1)[0]
+    const light = event_data.light.data.slice(-1)[0]
+    const water = event_data.water.data.slice(-1)[0]
+
+    // no rain
+    //TODO: fill if/else to choose img
+    if(water == "0"){
+        var img = "static/pictures/clear-day.svg"
+    }
+    // rain
+    else{
+        var img = "static/pictures/rain.svg"
+    }
+
+    // reload temperature and image
+    document.getElementById("temp_now").innerHTML = temp + "°C";
+    if(document.getElementById("temp_now_img").src != img){ // prevent jumps in animated image
+        document.getElementById("temp_now_img").src = img;
+    }
 };
