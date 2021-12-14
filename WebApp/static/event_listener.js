@@ -43,9 +43,9 @@ eventSource.onmessage = function(event) {
         var img = "static/pictures/rain.svg"
     }
 
-    // reload temperature and image
-    document.getElementById("temp_now").innerHTML = temp + "°C";
+    // reload image and temperature
     if(document.getElementById("temp_now_img").src != img){ // prevent jumps in animated image
         document.getElementById("temp_now_img").src = img;
     }
+    document.getElementById("temp_now").innerHTML = temp + "°C";
 };
