@@ -1,6 +1,7 @@
 from header import *
 import json
 from datetime import datetime, timedelta
+import pytz
 import paho.mqtt.client as mqtt
 from models import WeatherEntry
 
@@ -29,7 +30,8 @@ def on_message(client, obj, msg):
     payload = json.loads(data["payload"])
 
     # Add data to database
-    now = datetime.now()
+    timezone = pytz.timezone("Europe/Zurich")
+    now = datetime.now(timezone)
     db_entry = WeatherEntry(timestamp=now, temperature=payload["temperature"], humidity=payload["humidity"], pressure=payload["pressure"], light=payload["light"], water=payload["water"])
     db.session.add(db_entry)
     db.session.commit()

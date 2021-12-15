@@ -52,6 +52,8 @@ Mkfile.old
 dkms.conf
 
 # MacOS files
+~$WeatherStation.pptx
+
 .DS_Store
 WebApp/__pycache__
 .vscode

@@ -3,6 +3,7 @@ from header import *
 from mqtt_app import *
 import json
 import time
+import pytz
 
 def get_message():
     """Block until new data is available"""
@@ -12,7 +13,8 @@ def get_message():
         time.sleep(0.1)
 
     # Fetch data entries from last 24h
-    time_24_hours_ago = datetime.now() - timedelta(days=1)
+    timezone = pytz.timezone("Europe/Zurich")
+    time_24_hours_ago = datetime.now(timezone) - timedelta(days=1)
     db_data = WeatherEntry.query.filter(WeatherEntry.timestamp >= time_24_hours_ago).order_by(WeatherEntry.timestamp).all()
 
     timestamps = []
