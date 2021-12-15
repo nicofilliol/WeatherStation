@@ -64,3 +64,5 @@ WeatherStation/.settings/
 WeatherStation/Core/Inc/mqtt_config.h
 
 WebApp/mqtt.config
+*__pycache__*
+migrations/
