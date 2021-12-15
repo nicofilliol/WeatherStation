@@ -2,6 +2,7 @@ from header import *
 import json
 from datetime import datetime
 import paho.mqtt.client as mqtt
+from models import WeatherEntry
 
 # Define event callbacks
 def on_connect(client, userdata, flags, rc):
@@ -38,6 +39,9 @@ def on_message(client, obj, msg):
     light_queue.append((timestamp, payload["light"]))
     pressure_queue.append((timestamp, payload["pressure"]))
 
+    db_entry = WeatherEntry(timestamp=now, temperature=payload["temperature"], humidity=payload["humidity"], pressure=payload["pressure"], light=payload["light"], water=payload["water"])
+    db.session.add(db_entry)
+    db.session.commit()
     new_data_flag.set_state(True)
 
 def init_mqtt():
