@@ -32,7 +32,7 @@ eventSource.onmessage = function(event) {
     var temp = parseFloat(event_data.temperature.data.slice(-1)[0])
     // var pressure = parseFloat(event_data.pressure.data.slice(-1)[0])
     var light = parseFloat(event_data.light.data.slice(-1)[0])
-    var water = parseInt(event_data.water.data.slice(-1)[0])
+    var water = event_data.water.data.slice(-1)[0]
     console.log("parseFloat(Time): " + time)
 
     // day
