@@ -38,7 +38,7 @@ eventSource.onmessage = function(event) {
     // day
     if(8.0 < time < 20.00){
         // no rain
-        if(water == 0){
+        if(water == "No Rain"){
             if(light > 0.4){
                 // bright, day, no rain
                 var img = "static/pictures/clear-day.svg"
@@ -49,7 +49,7 @@ eventSource.onmessage = function(event) {
             }
         }
         // rain
-        else{
+        else {
             // warm
             if(temp > 0){
                 if(light > 0.4){
