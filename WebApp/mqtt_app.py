@@ -1,6 +1,6 @@
 from header import *
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import paho.mqtt.client as mqtt
 from models import WeatherEntry
 
@@ -28,17 +28,8 @@ def on_message(client, obj, msg):
     )
     payload = json.loads(data["payload"])
 
-    # Add data to queue
-
+    # Add data to database
     now = datetime.now()
-    timestamp = now.strftime("%H:%M:%S")
-
-    temperature_queue.append((timestamp, payload["temperature"]))
-    humidity_queue.append((timestamp, payload["humidity"]))
-    water_queue.append((timestamp, payload["water"]))
-    light_queue.append((timestamp, payload["light"]))
-    pressure_queue.append((timestamp, payload["pressure"]))
-
     db_entry = WeatherEntry(timestamp=now, temperature=payload["temperature"], humidity=payload["humidity"], pressure=payload["pressure"], light=payload["light"], water=payload["water"])
     db.session.add(db_entry)
     db.session.commit()
