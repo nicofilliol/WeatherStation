@@ -32,8 +32,8 @@ function init_water() {
             },
             scales: {
                 y: {
-                    type: 'linear',
-                    labels: ['Rain', 'Dry'],
+                    type: 'category',
+                    labels: ['Rain', 'No Rain'],
                     display: true,
                     position: 'left',
                     title: {
