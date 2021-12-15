@@ -28,22 +28,72 @@ eventSource.onmessage = function(event) {
 
 
     // Live temperature data
-    const temp = event_data.temperature.data.slice(-1)[0]
-    const pressure = event_data.pressure.data.slice(-1)[0]
-    const light = event_data.light.data.slice(-1)[0]
-    const water = event_data.water.data.slice(-1)[0]
+    var time = parseFloat(event_data.pressure.time.slice(-1)[0])
+    var temp = parseFloat(event_data.temperature.data.slice(-1)[0])
+    // var pressure = parseFloat(event_data.pressure.data.slice(-1)[0])
+    var light = parseFloat(event_data.light.data.slice(-1)[0])
+    var water = parseInt(event_data.water.data.slice(-1)[0])
+    console.log("parseFloat(Time): " + time)
 
-    // no rain
-    //TODO: fill if/else to choose img
-    if(water == "0"){
-        var img = "static/pictures/clear-day.svg"
+    // day
+    if(8.0 < time < 20.00){
+        // no rain
+        if(water == 0){
+            if(light > 0.4){
+                // bright, day, no rain
+                var img = "static/pictures/clear-day.svg"
+            }
+            else{
+                // dark/dull, day, no rain
+                var img = "static/pictures/partly-cloudy-day.svg"
+            }
+        }
+        // rain
+        else{
+            // warm
+            if(temp > 0){
+                if(light > 0.4){
+                    // bright, day, rain, warm
+                    var img = "static/pictures/partly-cloudy-day-rain.svg"
+                }
+                else{
+                    // dark/dull, day, rain, warm
+                    var img = "static/pictures/rain.svg"
+                }
+            }
+            // cold
+            else{
+                if(light > 0.4){
+                    // bright, day, rain, cold
+                    var img = "static/pictures/partly-cloudy-day-snow.svg"
+                }
+                else{
+                    // dark/dull, day, rain, cold
+                    var img = "static/pictures/snow.svg"
+                }
+            }
+        }
     }
-    // rain
+    // night
     else{
-        var img = "static/pictures/rain.svg"
+        if(water == 0){
+            // no rain, night
+            var img = "static/pictures/clear-night.svg"
+        }
+        // rain
+        else{
+            if(temp > 0){
+                // warm, night, rain
+                var img = "static/pictures/partly-cloudy-night-rain.svg"
+            }
+            else{
+                // cold, night, rain
+                var img = "static/pictures/partly-cloudy-night-snow.svg"
+            }
+        }
     }
 
-    // reload image and temperature
+    // reload weather icon and live temperature
     if(document.getElementById("temp_now_img").src != img){ // prevent jumps in animated image
         document.getElementById("temp_now_img").src = img;
     }

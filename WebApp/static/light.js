@@ -11,7 +11,7 @@ function init_light(labels, light) {
                     label: "Light",
                     data: light,
                     fill: false,
-                    borderColor: "rgb(255, 99, 132)",
+                    borderColor: "rgb(255, 159, 64)",
                     lineTension: 0.1,
                     yAxisID: 'y'
                 }

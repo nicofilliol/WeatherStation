@@ -11,9 +11,10 @@ function init_water(labels, water) {
                     label: "Water",
                     data: water,
                     fill: false,
-                    borderColor: "rgb(255, 99, 132)",
+                    borderColor: "rgb(54, 162, 235)",
                     lineTension: 0.1,
-                    yAxisID: 'y'
+                    yAxisID: 'y',
+                    stepped: true
                 }
             ]
         },
@@ -32,10 +33,11 @@ function init_water(labels, water) {
             scales: {
                 y: {
                     type: 'linear',
+                    labels: ['Rain', 'Dry'],
                     display: true,
                     position: 'left',
                     title: {
-                        display: true,
+                        display: false,
                         text: 'raining?'
                     }
                 },

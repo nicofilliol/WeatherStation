@@ -19,7 +19,7 @@ function init_temp(labels, temperature, humidity) {
                     label: "Humidity",
                     data: humidity,
                     fill: false,
-                    borderColor: "rgb(75, 192, 192)",
+                    borderColor: "rgb(54, 162, 235)",
                     lineTension: 0.1,
                     yAxisID: 'y1'
                 }

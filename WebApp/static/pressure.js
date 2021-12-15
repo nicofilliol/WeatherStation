@@ -11,7 +11,7 @@ function init_pressure(labels, pressure) {
                     label: "Pressure",
                     data: pressure,
                     fill: false,
-                    borderColor: "rgb(255, 99, 132)",
+                    borderColor: "rgb(75, 192, 192)",
                     lineTension: 0.1,
                     yAxisID: 'y'
                 }
