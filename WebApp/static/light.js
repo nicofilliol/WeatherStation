@@ -1,15 +1,15 @@
 var lineChart_light;
 
-function init_light(labels, light) {
+function init_light() {
     const ctx2 = document.getElementById('lightChart').getContext('2d');
     lineChart_light = new Chart(ctx2, {
         type: "line",
         data: {
-            labels: labels,
+            labels: [],
             datasets: [
                 {
                     label: "Light",
-                    data: light,
+                    data: [],
                     fill: false,
                     borderColor: "rgb(255, 159, 64)",
                     lineTension: 0.1,

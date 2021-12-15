@@ -1,15 +1,15 @@
 var lineChart_water;
 
-function init_water(labels, water) {
+function init_water() {
     const ctx2 = document.getElementById('waterChart').getContext('2d');
     lineChart_water = new Chart(ctx2, {
         type: "line",
         data: {
-            labels: labels,
+            labels: [],
             datasets: [
                 {
                     label: "Water",
-                    data: water,
+                    data: [],
                     fill: false,
                     borderColor: "rgb(54, 162, 235)",
                     lineTension: 0.1,

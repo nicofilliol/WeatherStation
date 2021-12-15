@@ -1,15 +1,15 @@
 var lineChart_pressure;
 
-function init_pressure(labels, pressure) {
+function init_pressure() {
     const ctx2 = document.getElementById('pressureChart').getContext('2d');
     lineChart_pressure = new Chart(ctx2, {
         type: "line",
         data: {
-            labels: labels,
+            labels: [],
             datasets: [
                 {
                     label: "Pressure",
-                    data: pressure,
+                    data: [],
                     fill: false,
                     borderColor: "rgb(75, 192, 192)",
                     lineTension: 0.1,

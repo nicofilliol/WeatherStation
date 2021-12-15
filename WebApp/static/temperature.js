@@ -1,15 +1,15 @@
 var lineChart_temp;
 
-function init_temp(labels, temperature, humidity) {
+function init_temp() {
     const ctx1 = document.getElementById('tempChart').getContext('2d');
     lineChart_temp = new Chart(ctx1, {
         type: "line",
         data: {
-            labels: labels,
+            labels: [],
             datasets: [
                 {
                     label: "Temperature",
-                    data: temperature,
+                    data: [],
                     fill: false,
                     borderColor: "rgb(255, 99, 132)",
                     lineTension: 0.1,
@@ -17,7 +17,7 @@ function init_temp(labels, temperature, humidity) {
                 },
                 {
                     label: "Humidity",
-                    data: humidity,
+                    data: [],
                     fill: false,
                     borderColor: "rgb(54, 162, 235)",
                     lineTension: 0.1,
