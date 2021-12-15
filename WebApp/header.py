@@ -21,7 +21,7 @@ class Ready_Flag():
 new_data_flag = Ready_Flag(True)
 
 app = Flask(__name__)
-database_url = os.environ.get("DATABASE_URL")
+database_url = "***REMOVED***"#os.environ.get("DATABASE_URL")
 database_url= database_url.replace("postgres", "postgresql", 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
