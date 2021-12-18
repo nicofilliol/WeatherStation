@@ -59,6 +59,7 @@ WebApp/__pycache__
 .vscode
 tempCodeRunnerFile.py
 
+credentials.h
 /.metadata
 WeatherStation/Debug/Drivers/STM32L4xx_HAL_Driver/Src/*.icloud
 WeatherStation/Debug/
