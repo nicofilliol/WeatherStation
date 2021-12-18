@@ -1,11 +1,3 @@
-/*
- * DHT22_2.c
- *
- *  Created on: Dec 1, 2021
- *      Author: joelasper
- */
-
-/************** MAKE CHANGES HERE ********************/
 #include "stm32l4xx_hal.h"
 
 //#define TYPE_DHT11    // define according to your sensor
@@ -146,7 +138,7 @@ void DHT_GetData (DHT_DataTypedef *DHT_Data)
 	Temp_byte2 = DHT_Read ();
 	SUM = DHT_Read();
 
-	if (SUM == (Rh_byte1+Rh_byte2+Temp_byte1+Temp_byte2))
+	if (SUM == ((Rh_byte1+Rh_byte2+Temp_byte1+Temp_byte2) & 0x00FF))
 	{
 		#if defined(TYPE_DHT11)
 			DHT_Data->Temperature = Temp_byte1;

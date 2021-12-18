@@ -37,6 +37,7 @@
 #include "helper_functions.h"
 #include "DHT.h"
 #include "wifi.h"
+#include "credentials.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,8 +48,10 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define WIFI_SSID ""
-#define WIFI_PASSPHRASE ""
+
+/* Define WiFi SSID and passphrase in credentials.h header file or! down below */
+// #define WIFI_SSID ""
+// #define WIFI_PASSPHRASE ""
 
 #define REMOTE_IP_ADDRESS "broker.hivemq.com"
 #define SUBSCRIBE_TOPIC ""

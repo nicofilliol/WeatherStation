@@ -1,10 +1,3 @@
-/*
- * DHT.h
- *
-*  Created on: Dec 1, 2021
- *      Author: joelasper
- */
-
 #ifndef DHT_H_
 #define DHT_H_
 
