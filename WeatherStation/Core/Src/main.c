@@ -73,6 +73,8 @@ I2C_HandleTypeDef hi2c2;
 
 IWDG_HandleTypeDef hiwdg;
 
+RTC_HandleTypeDef hrtc;
+
 SPI_HandleTypeDef hspi3;
 
 TIM_HandleTypeDef htim6;
@@ -96,12 +98,14 @@ static void MX_I2C2_Init(void);
 static void MX_TIM6_Init(void);
 static void MX_SPI3_Init(void);
 static void MX_IWDG_Init(void);
+static void MX_RTC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* Function prototypes for LPS22HB communication */
 lps22hb_err_t lps22hb_read(uint8_t reg, uint8_t *buf, uint8_t bytes);
 lps22hb_err_t lps22hb_write(uint8_t reg, uint8_t *buf, uint8_t bytes);
 void check_lps22hb_error(lps22hb_err_t err);
+void sleepDelay(uint16_t delaytime);
 
 /* Function prototypes for WiFi */
 void USR_WIFI_Init();
@@ -149,6 +153,7 @@ int main(void)
   MX_TIM6_Init();
   MX_SPI3_Init();
   MX_IWDG_Init();
+  MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 
   // Start Timer
@@ -227,7 +232,7 @@ int main(void)
 	/* Reset watchdog timer */
 	HAL_IWDG_Refresh(&hiwdg);
 
-	HAL_Delay(5000);
+	sleepDelay(5000);
 
     /* USER CODE END WHILE */
 
@@ -471,6 +476,41 @@ static void MX_IWDG_Init(void)
 }
 
 /**
+  * @brief RTC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RTC_Init(void)
+{
+
+  /* USER CODE BEGIN RTC_Init 0 */
+
+  /* USER CODE END RTC_Init 0 */
+
+  /* USER CODE BEGIN RTC_Init 1 */
+
+  /* USER CODE END RTC_Init 1 */
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
+
+}
+
+/**
   * @brief SPI3 Initialization Function
   * @param None
   * @retval None
@@ -679,6 +719,35 @@ void USR_WIFI_Init(){
     // Connect to the MQTT broker:
     WIFI_MQTTClientInit(&hwifi);
     printf("Initialized!\r\n");
+}
+
+void sleepDelay(uint16_t delaytime){
+
+    if(delaytime < 25) {
+        HAL_Delay(delaytime);
+        return;
+    }
+    else {
+        if(HAL_RTCEx_DeactivateWakeUpTimer(&hrtc) != HAL_OK) {
+                    HAL_Delay(delaytime);
+                    return;
+                }
+        __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+        uint32_t counter = (uint32_t)(delaytime * 1000) /432;
+        if(HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, (uint16_t)counter, RTC_WAKEUPCLOCK_RTCCLK_DIV16)!=HAL_OK) {
+                    HAL_Delay(delaytime);
+                    return;
+                }
+
+        printf("Entering stop mode\r\n...");
+        HAL_SuspendTick();
+        HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_STOPENTRY_WFI);
+        HAL_ResumeTick();
+        printf("Entering running mode\r\n...");
+
+
+    }
+
 }
 
 
