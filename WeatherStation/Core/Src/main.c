@@ -155,6 +155,14 @@ int main(void)
   MX_IWDG_Init();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
+  if (__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
+  {
+	  __HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);  // clear the flag
+
+	  printf("Starting up from standby mode..\r\n");
+	  /** Deactivate the RTC wakeup  **/
+	  HAL_RTCEx_DeactivateWakeUpTimer(&hrtc);
+  }
 
   // Start Timer
   HAL_TIM_Base_Start(&htim6);
@@ -182,6 +190,7 @@ int main(void)
   DHT_DataTypedef DHT22_Data;
   float temperature, humidity;
   uint8_t water = 0;
+
 
   /* USER CODE END 2 */
 
@@ -504,6 +513,12 @@ static void MX_RTC_Init(void)
   {
     Error_Handler();
   }
+  /** Enable the WakeUp
+  */
+  /*if (HAL_RTCEx_SetWakeUpTimer(&hrtc, 0, RTC_WAKEUPCLOCK_RTCCLK_DIV16) != HAL_OK)
+  {
+    Error_Handler();
+  }*/
   /* USER CODE BEGIN RTC_Init 2 */
 
   /* USER CODE END RTC_Init 2 */
@@ -731,21 +746,19 @@ void sleepDelay(uint16_t delaytime){
         if(HAL_RTCEx_DeactivateWakeUpTimer(&hrtc) != HAL_OK) {
                     HAL_Delay(delaytime);
                     return;
-                }
+         }
         __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
-        uint32_t counter = (uint32_t)(delaytime * 1000) /432;
+        __HAL_RTC_WAKEUPTIMER_CLEAR_FLAG(&hrtc, RTC_FLAG_WUTF);
+        uint32_t counter = (delaytime/1000.0)/(16.0/32000);//(uint32_t)(delaytime * 1000) /432;
         if(HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, (uint16_t)counter, RTC_WAKEUPCLOCK_RTCCLK_DIV16)!=HAL_OK) {
                     HAL_Delay(delaytime);
                     return;
                 }
 
-        printf("Entering stop mode\r\n...");
+        printf("Entering standby mode\r\n...");
         HAL_SuspendTick();
-        HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_STOPENTRY_WFI);
+        HAL_PWR_EnterSTANDBYMode();
         HAL_ResumeTick();
-        printf("Entering running mode\r\n...");
-
-
     }
 
 }
