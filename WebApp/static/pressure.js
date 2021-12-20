@@ -12,6 +12,7 @@ function init_pressure() {
                     data: [],
                     fill: false,
                     borderColor: "rgb(75, 192, 192)",
+                    pointRadius: 0.0,
                     lineTension: 0.1,
                     yAxisID: 'y'
                 }

@@ -12,6 +12,7 @@ function init_temp() {
                     data: [],
                     fill: false,
                     borderColor: "rgb(255, 99, 132)",
+                    pointRadius: 0.0,
                     lineTension: 0.1,
                     yAxisID: 'y'
                 },
@@ -20,6 +21,7 @@ function init_temp() {
                     data: [],
                     fill: false,
                     borderColor: "rgb(54, 162, 235)",
+                    pointRadius: 0.0,
                     lineTension: 0.1,
                     yAxisID: 'y1'
                 }

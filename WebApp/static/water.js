@@ -12,6 +12,7 @@ function init_water() {
                     data: [],
                     fill: false,
                     borderColor: "rgb(54, 162, 235)",
+                    pointRadius: 0.0,
                     lineTension: 0.1,
                     yAxisID: 'y',
                     stepped: true

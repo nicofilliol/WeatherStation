@@ -12,6 +12,7 @@ function init_light() {
                     data: [],
                     fill: false,
                     borderColor: "rgb(255, 159, 64)",
+                    pointRadius: 0.0,
                     lineTension: 0.1,
                     yAxisID: 'y'
                 }
